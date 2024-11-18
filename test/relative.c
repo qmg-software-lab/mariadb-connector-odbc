@@ -786,10 +786,26 @@ ODBC_TEST(t_rows_fetched_ptr1)
   return OK;
 }
 
+ODBC_TEST(bench)
+{
+  SQLINTEGER id= 0;
+  SQLCHAR val[32];
+  size_t i;
 
+  for (i= 0; i < 500; ++i) {
+    SQLExecDirect(Stmt, (SQLCHAR*)"SELECT * FROM 1000rows", SQL_NTS);
+
+    while (SQLFetch(Stmt) != SQL_NO_DATA) {
+      SQLGetData(Stmt, 1, SQL_INTEGER, &id, 0, NULL);
+      SQLGetData(Stmt, 2, SQL_VARCHAR, &val, sizeof(val), NULL);
+    }
+    SQLFreeStmt(Stmt, SQL_CLOSE);
+  }
+}
 
 MA_ODBC_TESTS my_tests[]=
 {
+  /*{bench, "bench"},*/
   {t_relative, "t_relative"},
   {t_relative1, "t_relative1"},
   {t_relative2, "t_relative2"},
